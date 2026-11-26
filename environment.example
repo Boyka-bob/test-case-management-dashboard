@@ -1,6 +1,6 @@
 # Database Configuration
-# For development (SQLite)
-DATABASE_URL="file:./dev.db"
+# Local development: PostgreSQL from `docker compose -f docker-compose.dev.yml up -d db`
+DATABASE_URL="postgresql://postgres:password@localhost:5432/testcasemanagement"
 
 # For production (PostgreSQL - get this from Vercel/Supabase/PlanetScale)
 # DATABASE_URL="postgresql://username:password@hostname:port/database?sslmode=require"
