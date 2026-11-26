@@ -12,6 +12,24 @@ export const prisma =
 
 if (process.env.NODE_ENV !== 'production') globalForPrisma.prisma = prisma
 
+// Sessions are created in the browser (auth-context.tsx) with a random userId and are
+// never written to the database. Every Epic/TestCase/AuditLog row has a foreign key to
+// users, so the first write for a new session must create its user row, or it fails.
+// The email is derived from the id because it must be unique and the same person can
+// log in more than once (each login gets a fresh id).
+export async function ensureUser(userId: string): Promise<void> {
+  await prisma.user.upsert({
+    where: { id: userId },
+    update: {},
+    create: {
+      id: userId,
+      name: 'Dashboard User',
+      email: `${userId}@users.local`,
+      isGuest: true,
+    },
+  })
+}
+
 // Audit logging utility
 export async function createAuditLog({
   userId,

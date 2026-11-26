@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { prisma, createAuditLog } from '@/lib/db';
+import { prisma, createAuditLog, ensureUser } from '@/lib/db';
 
 
 export async function GET(request: NextRequest) {
@@ -89,10 +89,12 @@ export async function POST(request: NextRequest) {
   try {
     const testCaseData = await request.json();
     const userId = testCaseData.userId;
-    
+
     if (!userId) {
       return NextResponse.json({ error: 'userId is required' }, { status: 400 });
     }
+
+    await ensureUser(userId);
 
     // Find or create epic
     let epic = await prisma.epic.findFirst({
