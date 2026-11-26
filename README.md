@@ -1,196 +1,113 @@
 # 🧪 Test Case Management Dashboard
 
-A modern, professional test case management dashboard built with Next.js, featuring AI-powered test generation, real-time collaboration, and comprehensive test tracking capabilities.
+A clean, self-hosted dashboard for writing, organizing and tracking manual test cases, with an AI assistant that drafts test cases for you. Built with Next.js 15, React 19, Prisma and shadcn/ui.
 
-![Test Case Dashboard](https://img.shields.io/badge/Built%20with-Next.js-black?style=for-the-badge&logo=next.js)
+![Next.js](https://img.shields.io/badge/Next.js_15-black?style=for-the-badge&logo=next.js)
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Prisma](https://img.shields.io/badge/Prisma-3982CE?style=for-the-badge&logo=Prisma&logoColor=white)
 
+![Dashboard, dark theme](docs/screenshots/dashboard-dark.png)
+
+<details>
+<summary>More screenshots</summary>
+
+**Light theme**
+
+![Dashboard, light theme](docs/screenshots/dashboard-light.png)
+
+**Welcome screen**: start your own workspace or try it as a guest
+
+![Welcome screen](docs/screenshots/welcome.png)
+
+</details>
+
 ## ✨ Features
 
-### 🎯 Core Test Management
-- **Create & Edit Test Cases** - Intuitive interface for test case management
-- **Epic Organization** - Group test cases by epic with dynamic selection
-- **Status Tracking** - Track test execution status (Passed, Failed, Not Run, Blocked)
-- **Bulk Operations** - Import/export test cases via CSV with sample templates
+- **Test cases by epic**: group cases (Authentication, Checkout, …) and filter by epic, status or text
+- **Status tracking**: Passed / Failed / Not Run, with live counts in the sidebar
+- **CSV import and export**: bring an existing spreadsheet in, take your suite out
+- **AI assistant**: generate test cases from templates (login, forms, navigation, …); uses OpenAI when `OPENAI_API_KEY` is set
+- **Comments and sharing**: discuss a case and share a dashboard with Owner / Editor / Viewer / Commentor roles
+- **Dark and light themes**, collapsible sidebar, responsive layout
+- **Audit log** of creates, updates and deletes
 
-### 🤖 AI-Powered Features
-- **AI Test Generation** - Generate test cases from templates using AI assistant
-- **Smart Templates** - Pre-built templates for common testing scenarios
-- **Contextual Suggestions** - AI-powered test case recommendations
+## 🚀 Quick start
 
-### 👥 Collaboration & Sharing
-- **Team Collaboration** - Share dashboards with role-based permissions
-- **Real-time Comments** - Add comments and collaborate on test cases
-- **Permission Management** - Owner, Editor, Viewer, and Commentor roles
+**Prerequisites:** Node.js 18+ and a PostgreSQL database.
 
-### 🎨 User Experience
-- **Dark/Light Themes** - Toggle between themes with persistent preferences
-- **Mobile Responsive** - Fully responsive design for all devices
-- **Collapsible Sidebar** - Optimized workspace management
-- **Expandable Test Cases** - Detailed view with notes and evidence
-
-### 🗄️ Data Management
-- **Multi-user Support** - Complete user data isolation
-- **Audit Logging** - Track all changes with comprehensive audit trails
-- **Export/Import** - CSV export/import with customizable fields
-- **Search & Filter** - Advanced filtering by epic, status, and text search
-
-## 🚀 Technology Stack
-
-- **Frontend**: Next.js 15, React 19, TypeScript
-- **Styling**: Tailwind CSS, shadcn/ui components
-- **Backend**: Next.js API Routes
-- **Database**: PostgreSQL (Production), SQLite (Development)
-- **ORM**: Prisma
-- **Authentication**: Custom session-based auth
-- **Deployment**: Vercel-ready with Docker support
-
-## 📦 Quick Start
-
-### Prerequisites
-- Node.js 18+ 
-- npm or yarn
-- PostgreSQL (for production)
-
-### Development Setup
-
-1. **Clone the repository**
-   ```bash
-   git clone https://github.com/YOUR_USERNAME/test-case-dashboard.git
-   cd test-case-dashboard
-   ```
-
-2. **Install dependencies**
-   ```bash
-   npm install
-   ```
-
-3. **Set up environment variables**
-   ```bash
-   cp environment.example .env
-   # Edit .env with your database URL and other configurations
-   ```
-
-4. **Set up database**
-   ```bash
-   npm run db:generate
-   npm run db:migrate
-   ```
-
-5. **Start development server**
-   ```bash
-   npm run dev
-   ```
-
-6. **Open your browser**
-   ```
-   http://localhost:3000
-   ```
-
-## 🌐 Deployment
-
-### Deploy to Vercel (Recommended)
-
-1. **Prepare for deployment**
-   ```bash
-   npm run deploy:vercel
-   ```
-
-2. **Deploy to Vercel**
-   - Connect your GitHub repository to Vercel
-   - Set environment variables in Vercel dashboard
-   - Deploy with one click
-
-3. **Set up production database**
-   - Use Supabase, PlanetScale, or your preferred PostgreSQL provider
-   - Add `DATABASE_URL` to Vercel environment variables
-
-For detailed deployment instructions, see [DEPLOYMENT.md](./DEPLOYMENT.md).
-
-## 📋 Usage Examples
-
-### Adding Test Cases
-```
-Epic: Authentication
-ID: TC1.1
-Description: User can login with valid credentials
-Expected Result: User successfully logged in and redirected to dashboard
-Status: Passed
+```bash
+git clone https://github.com/Boyka-bob/test-case-management-dashboard.git
+cd test-case-management-dashboard
+npm install
+cp environment.example .env
 ```
 
-### Bulk Import CSV Format
+**1. Get a database.** Either run one locally with Docker (uses the `db` service from `docker-compose.dev.yml`):
+
+```bash
+docker compose -f docker-compose.dev.yml up -d db
+```
+
+…or create a free hosted PostgreSQL database (Neon, Supabase, Vercel Postgres) and paste its connection string into `DATABASE_URL` in `.env`.
+
+**2. Create the tables and start the app.**
+
+```bash
+npx prisma db push
+npm run dev
+```
+
+Open http://localhost:3000, click **Try as Guest**, and add your first test case. Default epics and AI templates are created automatically on first load.
+
+## 📋 CSV import format
+
+The **Add Test Case** dialog can download a sample CSV with every supported column. The minimum is:
+
 ```csv
 Epic,ID,Description,Expected Result,Status,Notes
 Authentication,TC1.1,User login with valid credentials,Successful login,Passed,Working as expected
 Authentication,TC1.2,User login with invalid credentials,Error message displayed,Failed,Fix error styling
 ```
 
-### AI Test Generation
-Use the AI assistant to generate test cases from templates:
-- Select "Login Functionality" template
-- AI generates comprehensive test scenarios
-- Customize and add to your test suite
+Re-importing a row with an existing ID updates it instead of creating a duplicate.
 
 ## 🔧 Configuration
 
-### Environment Variables
-```bash
-# Database
-DATABASE_URL="postgresql://username:password@hostname:port/database"
+| Variable | Required | Purpose |
+|---|---|---|
+| `DATABASE_URL` | Yes | PostgreSQL connection string |
+| `NEXTAUTH_SECRET` | Yes | Any long random string |
+| `NEXTAUTH_URL` | Yes | `http://localhost:3000` locally, your domain in production |
+| `OPENAI_API_KEY` | No | Enables OpenAI-backed test generation in the AI assistant |
 
-# Authentication
-NEXTAUTH_SECRET="your-secret-key"
-NEXTAUTH_URL="https://your-app.vercel.app"
+See [`environment.example`](environment.example) for the full list.
 
-# Optional: AI Features
-OPENAI_API_KEY="sk-your-openai-key"
-```
+## 🌐 Deployment
 
-### Features Configuration
-- **AI Features**: Set `ENABLE_AI_FEATURES=true`
-- **Email Notifications**: Configure SMTP settings
-- **File Uploads**: Set up cloud storage providers
+The app deploys to Vercel as-is: import the repo, set the variables above, and point `DATABASE_URL` at a hosted PostgreSQL database. Docker (`Dockerfile`, `docker-compose.yml`) is included for self-hosting. Details: [DEPLOYMENT.md](DEPLOYMENT.md).
+
+## ⚠️ Security note
+
+Sign-in is a lightweight browser session (name + email, or guest) meant for demos and small trusted teams. It is not real authentication: the API trusts the user id the browser sends. Do not store sensitive data in a public deployment.
+
+## 🧱 Tech stack
+
+Next.js 15 (App Router, API routes) · React 19 · TypeScript · Tailwind CSS 4 · shadcn/ui · Prisma 6 · PostgreSQL
+
+## 🗺️ Roadmap
+
+- [ ] Real authentication (OAuth / email magic link)
+- [ ] Reporting and run history
+- [ ] Import from and export to popular test frameworks
+- [ ] Attachments and screenshots as evidence
 
 ## 🤝 Contributing
 
-We welcome contributions! Please see our [Contributing Guidelines](./CONTRIBUTING.md) for details.
-
-1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](./LICENSE) file for details.
-
-## 🎯 Roadmap
-
-- [ ] Advanced reporting and analytics
-- [ ] Integration with popular testing frameworks
-- [ ] Advanced AI features with custom models
-- [ ] Mobile app for iOS/Android
-- [ ] API documentation and SDK
-- [ ] Advanced permission management
-
-## 📞 Support
-
-- 📧 **Email**: [Your Email]
-- 🐛 **Issues**: [GitHub Issues](https://github.com/YOUR_USERNAME/test-case-dashboard/issues)
-- 📖 **Documentation**: [Wiki](https://github.com/YOUR_USERNAME/test-case-dashboard/wiki)
+Issues and pull requests are welcome. For larger changes, please open an issue first to discuss what you'd like to change.
 
 ## 🌟 Acknowledgments
 
-- Built with [Next.js](https://nextjs.org/)
-- UI components from [shadcn/ui](https://ui.shadcn.com/)
-- Icons from [Lucide](https://lucide.dev/)
-- Database management with [Prisma](https://prisma.io/)
+[Next.js](https://nextjs.org/) · [shadcn/ui](https://ui.shadcn.com/) · [Lucide](https://lucide.dev/) · [Prisma](https://prisma.io/)
 
----
-
-**Made with ❤️ for better test management**
-
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/YOUR_USERNAME/test-case-dashboard)
+If this project saves you time, a ⭐ helps others find it.
