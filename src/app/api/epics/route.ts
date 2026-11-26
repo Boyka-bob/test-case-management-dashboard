@@ -30,10 +30,10 @@ export async function GET(request: NextRequest) {
         testCases: {
           where: {
             deletedAt: null,
-            status: 'PASSED',
+            status: { in: ['PASSED', 'FAILED'] },
             ...(userId ? { userId } : {})
           },
-          select: { id: true }
+          select: { status: true }
         }
       },
       orderBy: { name: 'asc' }
@@ -42,7 +42,8 @@ export async function GET(request: NextRequest) {
     const transformedEpics = epics.map(epic => ({
       id: epic.id,
       name: epic.name,
-      passed: epic.testCases.length,
+      passed: epic.testCases.filter(tc => tc.status === 'PASSED').length,
+      failed: epic.testCases.filter(tc => tc.status === 'FAILED').length,
       total: epic._count.testCases
     }));
 

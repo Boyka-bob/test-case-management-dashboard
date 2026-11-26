@@ -37,7 +37,7 @@ export function DashboardSidebar({ epics, filters, onFiltersChange, isCollapsed,
 
   const totalTests = epics.reduce((sum, epic) => sum + epic.total, 0);
   const passedTests = epics.reduce((sum, epic) => sum + epic.passed, 0);
-  const failedTests = 0; // You can calculate this from actual test data
+  const failedTests = epics.reduce((sum, epic) => sum + (epic.failed ?? 0), 0);
   const notRunTests = totalTests - passedTests - failedTests;
 
   if (isCollapsed) {

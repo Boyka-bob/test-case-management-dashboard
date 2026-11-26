@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { PrismaClient } from '@prisma/client';
-import { createAuditLog } from '@/lib/db';
+import { createAuditLog, ensureUser } from '@/lib/db';
 
 const prisma = new PrismaClient();
 
@@ -14,6 +14,8 @@ export async function POST(request: NextRequest) {
         { status: 400 }
       );
     }
+
+    await ensureUser(userId);
 
     const results = {
       created: 0,
@@ -53,16 +55,33 @@ export async function POST(request: NextRequest) {
           });
         }
 
+        // Build the row explicitly. Spreading testCaseData sent `epic` (a name string,
+        // not a relation) and UI status labels ('Passed') straight to Prisma, so every
+        // bulk row was rejected. Mirrors the single-create mapping in ../route.ts.
+        const fields = {
+          application: testCaseData.application || 'Test Application',
+          module: testCaseData.module || 'General',
+          testType: testCaseData.testType || 'FUNCTIONAL',
+          testScenarioId: testCaseData.testScenarioId || `TS_${Date.now()}`,
+          testScenario: testCaseData.testScenario || testCaseData.title,
+          title: testCaseData.title,
+          description: testCaseData.description || '',
+          detailedSteps: JSON.stringify(testCaseData.detailedSteps || []),
+          expectedResult: testCaseData.expectedResult || '',
+          actualBehavior: testCaseData.actualBehavior || '',
+          status: testCaseData.status === 'Passed' ? 'PASSED' as const :
+                  testCaseData.status === 'Failed' ? 'FAILED' as const : 'NOT_RUN' as const,
+          notes: testCaseData.notes || '',
+          evidence: testCaseData.evidence || '',
+          tags: JSON.stringify([]),
+          epicId: epic.id
+        };
+
         if (existingTestCase) {
           // Update existing test case
           await prisma.testCase.update({
             where: { id: existingTestCase.id },
-            data: {
-              ...testCaseData,
-              detailedSteps: JSON.stringify(testCaseData.detailedSteps || []),
-              tags: JSON.stringify([]),
-              epicId: epic.id
-            }
+            data: fields
           });
 
           // Create audit log
@@ -80,11 +99,8 @@ export async function POST(request: NextRequest) {
           // Create new test case
           const newTestCase = await prisma.testCase.create({
             data: {
-              ...testCaseData,
-              userId,
-              epicId: epic.id,
-              detailedSteps: JSON.stringify(testCaseData.detailedSteps || []),
-              tags: JSON.stringify([])
+              ...fields,
+              userId
             }
           });
 

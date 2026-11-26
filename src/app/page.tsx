@@ -21,7 +21,7 @@ export default function Dashboard() {
     epic: null,
     search: '',
   });
-  const [loading] = useState(true);
+  const [loading, setLoading] = useState(true);
   const [expandedTestCase, setExpandedTestCase] = useState<string | null>(null);
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
   
@@ -55,6 +55,9 @@ export default function Dashboard() {
       setTestCases(data);
     } catch (error) {
       console.error('Failed to fetch test cases:', error);
+    } finally {
+      // Without this the skeleton grid shows forever and no test case ever renders.
+      setLoading(false);
     }
   }, [currentSession, filters]);
 

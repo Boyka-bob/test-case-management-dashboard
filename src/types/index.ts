@@ -23,6 +23,7 @@ export interface Epic {
   id: string;
   name: string;
   passed: number;
+  failed?: number;
   total: number;
 }
 
